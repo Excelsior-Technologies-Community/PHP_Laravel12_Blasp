@@ -404,5 +404,8 @@ PHP_Laravel12_Blasp/
 
 Your PHP_Laravel12_Blasp Project is now ready!
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> development

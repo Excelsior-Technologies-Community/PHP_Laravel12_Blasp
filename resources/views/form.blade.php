@@ -1,70 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Blasp Filter</title>
-
-    <!-- Tailwind CDN -->
+    <title>Blasp Filter System</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            background: #0b0f19;
+        }
+
+        .card {
+            background: #111827;
+            border: 1px solid #1f2937;
+        }
+
+        .soft-glow {
+            box-shadow: 0 0 0 1px #1f2937, 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100 min-h-screen flex flex-col items-center py-10">
+<body class="text-gray-200 min-h-screen">
 
-    <!-- Header -->
-    <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-gray-800">🧩 Blasp Filter</h1>
-        <p class="text-gray-500 mt-2">Clean your messages from profanity</p>
-    </div>
+    <!-- HEADER -->
+    <header class="border-b border-gray-800 bg-[#0b0f19]">
+        <div class="max-w-6xl mx-auto px-6 py-6">
+            <h1 class="text-3xl font-bold tracking-wide">
+                🧩 Blasp Filter System
+            </h1>
+            <p class="text-gray-400 text-sm mt-1">
+                Cyber minimal dark dashboard UI
+            </p>
+        </div>
+    </header>
 
-    <!-- Form Card -->
-    <div class="bg-white shadow-lg rounded-2xl p-6 w-full max-w-md">
-        <form method="POST" action="{{ route('check') }}" class="space-y-4">
-            @csrf
+    <div class="max-w-6xl mx-auto px-6 py-6">
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    Enter Message
-                </label>
-                <input
-                    type="text"
-                    name="message"
-                    placeholder="Type your message..."
-                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    required
-                >
+        <!-- STATS -->
+        <div class="grid md:grid-cols-3 gap-5 mb-8">
+
+            <div class="card soft-glow rounded-xl p-5">
+                <p class="text-gray-500 text-sm">Total Messages</p>
+                <h2 class="text-3xl font-bold mt-2">{{ $messages->total() }}</h2>
             </div>
 
-            <button
-                type="submit"
-                class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
-            >
-                Check Message
-            </button>
-        </form>
-    </div>
-
-    <!-- Messages Section -->
-    <div class="w-full max-w-2xl mt-10">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4">
-            Saved Messages
-        </h2>
-
-        @forelse($messages as $msg)
-            <div class="bg-white shadow-md rounded-xl p-4 mb-4 border border-gray-200">
-                <p class="text-gray-700">
-                    <span class="font-semibold text-gray-900">Original:</span>
-                    {{ $msg->original }}
-                </p>
-
-                <p class="text-gray-700 mt-1">
-                    <span class="font-semibold text-green-600">Filtered:</span>
-                    {{ $msg->filtered }}
-                </p>
+            <div class="card soft-glow rounded-xl p-5">
+                <p class="text-gray-500 text-sm">Search Engine</p>
+                <h2 class="text-lg font-semibold mt-2 text-blue-400">Active</h2>
             </div>
-        @empty
-            <p class="text-gray-500">No messages found.</p>
-        @endforelse
+
+            <div class="card soft-glow rounded-xl p-5">
+                <p class="text-gray-500 text-sm">System Status</p>
+                <h2 class="text-lg font-semibold mt-2 text-green-400">Running</h2>
+            </div>
+
+        </div>
+
+        <!-- ALERT -->
+        @if(session('success'))
+            <div class="card soft-glow rounded-xl p-4 mb-6 text-green-400 border border-green-500/20">
+                ✅ {{ session('success') }}
+            </div>
+        @endif
+
+        <!-- FORM + SEARCH -->
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+
+            <!-- FORM -->
+            <div class="card soft-glow rounded-xl p-6">
+
+                <h2 class="text-lg font-semibold mb-4">➕ Add Message</h2>
+
+                <form method="POST" action="{{ route('check') }}" class="space-y-4">
+                    @csrf
+
+                    <input type="text" name="message" placeholder="Type your message..."
+                        class="w-full p-3 rounded-lg bg-[#0b0f19] border border-gray-700 text-white focus:outline-none focus:border-blue-500">
+
+                    <button class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-semibold transition">
+                        Submit
+                    </button>
+                </form>
+
+            </div>
+
+            <!-- SEARCH -->
+            <div class="card soft-glow rounded-xl p-6">
+
+                <h2 class="text-lg font-semibold mb-4">🔍 Search Messages</h2>
+
+                <form method="GET">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search messages..."
+                        class="w-full p-3 rounded-lg bg-[#0b0f19] border border-gray-700 text-white focus:outline-none focus:border-green-500">
+                </form>
+
+                <p class="text-xs text-gray-500 mt-2">
+                    Search original and filtered text instantly
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- MESSAGE LIST -->
+        <div class="space-y-4">
+
+            @forelse($messages as $msg)
+
+                <div
+                    class="card soft-glow rounded-xl p-5 flex justify-between items-start hover:border-gray-600 transition">
+
+                    <div class="space-y-1">
+
+                        <p>
+                            <span class="text-gray-400">Original:</span>
+                            {{ $msg->original }}
+                        </p>
+
+                        <p class="text-green-400">
+                            <span class="text-gray-400">Filtered:</span>
+                            {{ $msg->filtered }}
+                        </p>
+
+                    </div>
+
+                    <a href="{{ route('delete', $msg->id) }}" onclick="return confirm('Delete this message?')"
+                        class="text-red-400 hover:text-red-300 text-sm font-semibold">
+                        Delete
+                    </a>
+
+                </div>
+
+            @empty
+
+                <div class="card soft-glow rounded-xl p-6 text-center text-gray-500">
+                    No messages found
+                </div>
+
+            @endforelse
+
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="mt-6 card soft-glow rounded-xl p-4">
+            {{ $messages->links() }}
+        </div>
+
     </div>
 
 </body>
+
 </html>
