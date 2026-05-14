@@ -8,38 +8,46 @@ use Blaspsoft\Blasp\Facades\Blasp;
 
 class MessageController extends Controller
 {
-    /**
-     * Show form + all saved messages
-     */
-    public function index()
+    public function index(Request $request)
     {
-        $messages = Message::latest()->get();
+        $query = Message::query();
+
+        // SEARCH FUNCTIONALITY
+        if ($request->search) {
+            $query->where('original', 'like', '%' . $request->search . '%')
+                ->orWhere('filtered', 'like', '%' . $request->search . '%');
+        }
+
+        // PAGINATION
+        $messages = $query->oldest()->paginate(2);
+
         return view('form', compact('messages'));
     }
 
-    /**
-     * Handle form submission
-     */
     public function check(Request $request)
     {
-        // Validation
         $request->validate([
-            'message' => ['required']
+            'message' => 'required'
         ]);
 
-        // Original input
         $original = $request->message;
-
-        // Apply Blasp filter
         $filtered = Blasp::check($original)->getCleanString();
 
-        // Save into database
         Message::create([
             'original' => $original,
             'filtered' => $filtered
         ]);
 
-        // Return result page
-        return view('result', compact('original', 'filtered'));
+        return redirect('/')
+            ->with('success', 'Message filtered successfully!');
+    }
+
+    // DELETE FUNCTION
+    public function delete($id)
+    {
+        Message::findOrFail($id)->delete();
+
+        return redirect('/')
+            ->with('success', 'Message deleted successfully!');
     }
 }
